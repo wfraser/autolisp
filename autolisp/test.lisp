@@ -16,7 +16,7 @@
             (:body
                 (:h1 "AutoLisp Test")
                 (:p "This is "
-                    (:tt (format out "~A~A" (autolisp:getcwd) (hunchentoot:script-name*))))
+                    (:tt (format out "~A~A" (autolisp:getcwd) (subseq (hunchentoot:script-name*) 1))))
                 (:p (format out "Today is ~A" 
                     (read-line 
                         (sb-ext:process-output 
