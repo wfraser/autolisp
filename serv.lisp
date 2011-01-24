@@ -107,13 +107,10 @@
     (eval-file file))
 
 (defun autolisp-source-dispatcher (&optional file)
-    (cond ((null file)
-        (let ((uri (script-name*)))
-            (setq file (map-uri-to-file
-                (subseq uri 0 (- (length uri) (length ".source")))))))
+    (cond ((null file) (setq file (map-uri-to-file (script-name*))))
         (t (setq file (map-uri-to-file file))))
     (dbg "autolisp-source-dispatcher sending ~A~%" file)
-    (handle-static-file file))
+    (handle-static-file file "text/plain"))
 
 (defun autolisp-plain-dispatcher (&optional file)
     (cond ((null file) (setq file (map-uri-to-file (script-name*))))
@@ -125,8 +122,7 @@
     `(
         ,(create-regex-dispatcher "/$" `autolisp-index-dispatcher)
         ,(create-regex-dispatcher "/.*\.lisp$" `autolisp-dispatcher)
-;        ,(create-regex-dispatcher "/.*\.lisp\.source$" `autolisp-source-dispatcher)
-        ,(create-regex-dispatcher "/.*\.lisp\.source$" `autolisp-plain-dispatcher)
+        ,(create-regex-dispatcher "/.*\.lisp\.source$" `autolisp-source-dispatcher)
         ,(create-prefix-dispatcher "/" `autolisp-plain-dispatcher)))
 
 ;; note: won't redefine on reloading
