@@ -1,11 +1,18 @@
+Prerequisites:
+    - sbcl, Steel Bank Common Lisp
+    - cl-who (optional, but really, you'll want it)
+    - Hunchentoot
+        - a slight modification to Hunchentoot:
+            In Hunchentoot's packages.lisp, add "*MIME-TYPE-HASH*" to the list of exports.
+        - alternatively, remove all entries from *custom-mime-types* in serv.lisp
+
 To run AutoLisp:
     $ sbcl --load serv.lisp
 
 To make a binary:
     * edit serv.lisp:
         - comment out the (start-server) at the end
-        - uncomment or add in (sb-ext:save-lisp-and-die "serv.bin" :executable t :toplevel 'autolisp:start-server) at the bottom
-        - change (start-server) so it ends with (loop (sleep 1000)) -- this prevents returning to the toplevel read-eval-print loop when running the binary.
+        - uncomment or add in (sb-ext:save-lisp-and-die "serv.bin" :executable t :toplevel 'autolisp:start-server-and-wait) at the end
     $ sbcl --disable-debugger --load serv.lisp
         - this spits out serv.bin, a binary executable
 

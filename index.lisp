@@ -21,4 +21,4 @@
                 (:a :href "autolisp/test.lisp.source"
                     (:i "source")))
             (:p "The source for AutoLisp can be found "
-                (:a :href "serv.lisp.source" "here")))))
+                (:a :href "https://github.com/wfraser/autolisp" "on GitHub")))))

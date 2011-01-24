@@ -12,13 +12,13 @@
 
 (defpackage :autolisp
     (:use :cl :cl-who :hunchentoot)
-    (:export :getcwd :reload :start-server))
+    (:export :getcwd :reload :start-server :start-server-and-wait))
 
 (in-package :autolisp)
 
 (defmacro dbg (fmt &rest args)
-;    `(format t ,fmt ,@args))
-    `(list ,fmt ,@args))
+;    `(format t ,fmt ,@args))       ; swap these two lines for debug output
+    `(list ,fmt ,@args))            ; 
 
 (setf *show-lisp-errors-p* t)
 ;(setf *show-lisp-backtraces-p* t)
@@ -26,11 +26,10 @@
 
 (defparameter *autolisp-server-port* 3259)
 
-(defparameter *autolisp-basedir* "/home/wfraser/lisp/")
+(defparameter *autolisp-basedir* nil)   ; nil means to use the current working directory
 (defparameter *autolisp-mapping* (list
     ; url prefix     => filesystem prefix
     (cons "/autolisp/"  "autolisp/")
-    (cons "/srv/"       "/srv/www/")
     (cons "/"           "")))
 (defparameter *autolisp-indexes* (list
     (cons "index.html"  `autolisp-plain-dispatcher)
@@ -45,7 +44,7 @@
 
 (defun getcwd ()
     (block nil
-#+sbcl  (return (sb-posix:getcwd))
+#+sbcl  (return (concatenate 'string (sb-posix:getcwd) "/"))
 #+clisp (return (ext:cd))
         (error "no getcwd available!")))
 
@@ -126,7 +125,8 @@
     `(
         ,(create-regex-dispatcher "/$" `autolisp-index-dispatcher)
         ,(create-regex-dispatcher "/.*\.lisp$" `autolisp-dispatcher)
-        ,(create-regex-dispatcher "/.*\.lisp\.source$" `autolisp-source-dispatcher)
+;        ,(create-regex-dispatcher "/.*\.lisp\.source$" `autolisp-source-dispatcher)
+        ,(create-regex-dispatcher "/.*\.lisp\.source$" `autolisp-plain-dispatcher)
         ,(create-prefix-dispatcher "/" `autolisp-plain-dispatcher)))
 
 ;; note: won't redefine on reloading
@@ -136,6 +136,10 @@
     (cond ((null *acceptor*)
         (setq *acceptor*
             (hunchentoot:start (make-instance 'hunchentoot:acceptor :port *autolisp-server-port*))))))
+
+(defun start-server-and-wait ()
+    (start-server)
+    (loop (sleep 1000)))
 
 (defun reload ()
     (format t "reloading autolisp~%")
@@ -147,6 +151,6 @@
             (setq *acceptor* nil)
             (start-server)))))
 
-;(sb-ext:save-lisp-and-die "serv.bin" :executable t :toplevel 'autolisp:start-server)
+;(sb-ext:save-lisp-and-die "serv.bin" :executable t :toplevel 'autolisp:start-server-and-wait)
 
 (start-server)
