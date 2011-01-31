@@ -28,9 +28,9 @@
 
 (defparameter *autolisp-basedir* nil)   ; nil means to use the current working directory
 (defparameter *autolisp-mapping* (list
-    ; url prefix     => filesystem prefix
-    (cons "/autolisp/"  "autolisp/")
-    (cons "/"           "")))
+    ; url prefix   =>  filesystem prefix
+    (cons "/autolisp/" "test/")
+    (cons "/"          "")))
 (defparameter *autolisp-indexes* (list
     (cons "index.html"  `autolisp-plain-dispatcher)
     (cons "index.lisp"  `autolisp-dispatcher)))
