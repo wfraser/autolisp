@@ -18,8 +18,8 @@
 (in-package :autolisp)
 
 (defmacro dbg (fmt &rest args)
-    `(format t ,fmt ,@args))       ; swap these two lines for debug output
-;    `(list ,fmt ,@args))            ; 
+;    `(format t ,fmt ,@args))       ; swap these two lines for debug output
+    `(list ,fmt ,@args))            ; 
 
 (setf *show-lisp-errors-p* t)
 ;(setf *show-lisp-backtraces-p* t)
@@ -164,9 +164,7 @@
 (defun autolisp-master-dispatcher ()
     (let ((file (map-uri-to-file (script-name*))))
         (cond ((cl-ppcre:scan "\.lisp$" file)
-                (block nil
-                    (format t "file(~A) dispatching for lisp: ~A~%" file (cl-ppcre:scan "\.lisp$" file))
-                    (autolisp-dispatcher file)))
+                (autolisp-dispatcher file))
             ((cl-ppcre:scan "\.lisp\.source$" file)
                 (autolisp-source-dispatcher file))
             ((cl-ppcre:scan "/$" file)
