@@ -62,8 +62,8 @@
 
 (defun find-real-file-prefix (path)
     (let ((prefix path)
-          (suffix "")
-          (name ""))
+          (suffix nil)
+          (name nil))
 
         ; strip directory components off the end until the path exists.
         (loop while (null (probe-file prefix)) do
@@ -74,7 +74,7 @@
 
         (when (and (null (pathname-name (probe-file prefix))) (not (null suffix)))
             ; no suffix allowed if it's a directory
-            (dbg "doing 404 from find-real-file-prefix")
+            (dbg "doing 404 from find-real-file-prefix~%")
             (setf (hunchentoot:return-code*) 404)
             (hunchentoot:abort-request-handler))
 
