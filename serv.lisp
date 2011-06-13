@@ -9,13 +9,16 @@
 (ql:quickload "hunchentoot")
 (ql:quickload "cl-who")
 (ql:quickload "cl-ppcre")
+(ql:quickload "drakma")
 ;(ql:quickload "hunchentoot-dir-lister")
 
 (defpackage :autolisp
     (:use :cl :cl-who :hunchentoot)
-    (:export :getcwd :reload :start-server :start-server-and-wait :*script-name* :*script-filename* :*path-info*))
+    (:export :getcwd :readfile :reload :start-server :start-server-and-wait :*script-name* :*script-filename* :*path-info* :*working-dir*))
 
 (in-package :autolisp)
+
+(load "util.lisp")
 
 (defmacro dbg (fmt &rest args)
 ;    `(format t ,fmt ,@args))       ; swap these two lines for debug output
@@ -42,6 +45,7 @@
 (defvar *script-name* nil)
 (defvar *script-filename* nil)
 (defvar *path-info* nil)
+(defvar *working-dir* nil)
 
 ;; this requires modifying Hunchentoot to make *mime-type-hash* exported
 (loop for pair in *custom-mime-types* do
@@ -52,6 +56,8 @@
 #+sbcl  (return (concatenate 'string (sb-posix:getcwd) "/"))
 #+clisp (return (ext:cd))
         (error "no getcwd available!")))
+
+(setf *working-dir* (getcwd))
 
 (defmacro is-relative-path (path)
     `(or (eql :relative (car (pathname-directory ,path)))
@@ -144,7 +150,13 @@
                 (setf (return-code*) +http-not-found+))
             ((not (pathname-name canonical-file))
                 (setf (return-code*) +http-forbidden+))
-            (t (eval (read (open file)))))))
+            (t
+                (let ()
+                    (setf *working-dir* (directory-namestring file))
+                    (dbg "running ~A under ~A~%" 
+                        (enough-namestring file *working-dir*)
+                        *working-dir*)
+                    (eval (read (open file))))))))
 
 (defun autolisp-dispatcher (&optional file)
     (if (null file) (setq file (map-uri-to-file (script-name*))))
